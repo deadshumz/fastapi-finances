@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     pg_dsn: PostgresDsn | None = None
 
     @field_validator("pg_dsn", mode="before")
+    @classmethod
     def build_pg_dsn(cls, v: str | None, fields) -> str:
         if isinstance(v, str):
             return v
