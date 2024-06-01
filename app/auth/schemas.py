@@ -6,11 +6,10 @@ class UserBase(BaseModel):
     email: EmailStr
 
 
-class UserIn(UserBase):
+class UserCreate(UserBase):
     password: str
 
 
-class UserOut(UserBase):
-
+class UserRead(UserBase):
     class Config:
         from_attributes = True
