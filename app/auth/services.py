@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.exceptions import UserAlreadyExistsException
 from app.auth.models import User
 from app.auth.schemas import UserCreate, UserRead
-from app.auth.utils import hash_password
+from app.auth.utils import hash_password, verify_password
 
 
-async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[UserRead]:
+async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[User]:
     query = select(User).offset(skip).limit(limit)
     result = await db.execute(query)
     db_users = result.scalars().all()
@@ -20,19 +20,26 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 10) -> list[Us
     return users
 
 
-async def get_user_by_username(db: AsyncSession, username: str) -> UserRead | None:
+async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
     query = select(User).filter_by(username=username)
     result = await db.execute(query)
     db_user = result.scalars().first()
-    user = UserRead.model_validate(db_user)
-    return user
+    return db_user
 
 
-async def get_user_by_email(db: AsyncSession, email: EmailStr) -> UserRead | None:
+async def get_user_by_email(db: AsyncSession, email: EmailStr) -> User | None:
     query = select(User).filter_by(email=email)
     result = await db.execute(query)
     db_user = result.scalars().first()
-    user = UserRead.model_validate(db_user)
+    return db_user
+
+
+async def authenticate_user(db: AsyncSession, username: str, password: str):
+    user = await get_user_by_username(db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.password):
+        return False
     return user
 
 

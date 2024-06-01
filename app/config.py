@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     DB_PORT: int | None = None
     DB_NAME: str | None = None
     pg_dsn: PostgresDsn | None = None
+    JWT_SECRET_KEY: str | None = None
+    JWT_ALGHORITHM: str | None = None
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int | None = None
 
     @field_validator("pg_dsn", mode="before")
     @classmethod
